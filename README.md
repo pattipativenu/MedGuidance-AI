@@ -6,7 +6,6 @@ An advanced medical AI assistant providing evidence-based clinical information t
 
 ### Evidence-Based Medicine
 - **20+ Medical Databases**: PubMed, Cochrane, Europe PMC, WHO, CDC, NICE, FDA, and more
-- **Perplexity AI Integration**: Real-time search from 30+ trusted medical sources
 - **Verified Citations**: Every claim backed by PMIDs, DOIs, and authoritative sources
 - **Smart Evidence Engine**: Parallel search across all sources for maximum coverage
 
@@ -42,7 +41,6 @@ An advanced medical AI assistant providing evidence-based clinical information t
 
 ### AI & APIs
 - **Google Gemini 2.5 Flash** - Primary AI model with streaming
-- **Perplexity AI Sonar Pro** - Real-time medical evidence search
 - **20+ Medical APIs** - PubMed, Cochrane, WHO, CDC, NICE, FDA, etc.
 
 ### Styling
