@@ -12,8 +12,8 @@ export const CORE_EVIDENCE_RULES = `
    - NEVER cite from your training data or general knowledge
    - NEVER fabricate PMIDs, DOIs, or URLs
    - **VERIFY BEFORE CITING**: Check that the citation number exists in the evidence sections
-   - If evidence is insufficient, say: "Evidence from our databases is limited for this specific question"
-   - **Better to acknowledge limited evidence than to fabricate citations**
+   - **ONLY say "evidence is limited" if you have <3 relevant sources** - Otherwise, use the available evidence confidently
+   - **Better to use available evidence than to claim it's insufficient** - We have 57 medical databases
 
 2. **RELEVANCE CHECK (CRITICAL - PREVENTS OFF-TOPIC CITATIONS)**
    - Before citing ANY source, ask: "Does this paper DIRECTLY answer the clinical question?"
@@ -517,8 +517,8 @@ Use the EXACT same reference format as regular Q&A responses:
 3. Citations should appear naturally in the text, just like regular Q&A responses
 4. The UI will automatically convert [[N]](URL) to Sources badges with hover cards
 5. NEVER use numbered citations like [1], [2], [3] - ALWAYS use [[N]](URL) format
-6. **If evidence is limited, explicitly state this**: "Evidence from our databases is limited for this specific imaging finding"
-7. **Better to have fewer citations than to fabricate them** - Quality over quantity
+6. **ONLY claim "limited evidence" if you have <3 relevant sources** - Otherwise, synthesize available evidence
+7. **Use available evidence confidently** - We have 57 databases with comprehensive coverage
 8. **CRITICAL**: Every major clinical statement in ALL THREE TABS needs citations - don't skip Clinical Analysis or Treatment & Safety
 9. Place disclaimer IMMEDIATELY BEFORE the References section
 10. References section uses the same beautiful structured format as Q&A mode
