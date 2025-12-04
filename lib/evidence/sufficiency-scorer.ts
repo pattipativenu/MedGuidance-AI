@@ -155,19 +155,19 @@ export function scoreEvidenceSufficiency(
       recentArticles: 0,
     };
 
-    // 1. Cochrane Reviews (Gold Standard) - 30 points
+    // 1. Cochrane Reviews (Gold Standard) - 35 points (INCREASED from 30)
     try {
       const cochraneCount = (evidence.cochraneReviews?.length || 0) + (evidence.cochraneRecent?.length || 0);
       if (cochraneCount > 0) {
-        breakdown.cochraneReviews = 30;
-        score += 30;
+        breakdown.cochraneReviews = 35;
+        score += 35;
         reasoning.push(`${cochraneCount} Cochrane review${cochraneCount > 1 ? 's' : ''} (gold standard)`);
       }
     } catch (error: any) {
       console.error('❌ Error scoring Cochrane reviews:', error.message);
     }
 
-    // 2. Clinical Guidelines - 25 points
+    // 2. Clinical Guidelines - 30 points (INCREASED from 25)
     try {
       const guidelineCount =
         (evidence.guidelines?.length || 0) +
@@ -180,29 +180,29 @@ export function scoreEvidenceSufficiency(
         (evidence.aapGuidelines?.length || 0);
 
       if (guidelineCount > 0) {
-        breakdown.guidelines = 25;
-        score += 25;
+        breakdown.guidelines = 30;
+        score += 30;
         reasoning.push(`${guidelineCount} clinical guideline${guidelineCount > 1 ? 's' : ''}`);
       }
     } catch (error: any) {
       console.error('❌ Error scoring guidelines:', error.message);
     }
 
-    // 3. RCTs with Results - 20 points
+    // 3. RCTs with Results - 25 points (INCREASED from 20)
     try {
       const rctsWithResults = (evidence.clinicalTrials || []).filter(
         trial => trial.hasResults && trial.studyType === 'Interventional'
       );
       if (rctsWithResults.length > 0) {
-        breakdown.rcts = 20;
-        score += 20;
+        breakdown.rcts = 25;
+        score += 25;
         reasoning.push(`${rctsWithResults.length} randomized controlled trial${rctsWithResults.length > 1 ? 's' : ''} with results`);
       }
     } catch (error: any) {
       console.error('❌ Error scoring RCTs:', error.message);
     }
 
-    // 4. Recent Articles (last 5 years, ≥3 articles) - 15 points
+    // 4. Recent Articles (last 5 years, ≥3 articles) - 20 points (INCREASED from 15)
     // SOFTENED: Lowered threshold from 5 to 3 articles to avoid false "limited evidence"
     // ENHANCED: Count articles from all sources, not just PubMed
     try {
@@ -239,11 +239,15 @@ export function scoreEvidenceSufficiency(
       recentCount += (evidence.pmcReviews?.length || 0);
 
       if (recentCount >= 3) {  // Lowered from 5 to 3
-        breakdown.recentArticles = 15;
-        score += 15;
+        breakdown.recentArticles = 20;
+        score += 20;
         reasoning.push(`${recentCount} recent articles (last 5 years)`);
       } else if (recentCount > 0) {
-        reasoning.push(`Only ${recentCount} recent articles (need ≥3 for full credit)`);
+        // Give partial credit even for 1-2 recent articles
+        const partialCredit = recentCount * 8;
+        breakdown.recentArticles = partialCredit;
+        score += partialCredit;
+        reasoning.push(`${recentCount} recent article${recentCount > 1 ? 's' : ''} (partial credit: +${partialCredit} points)`);
       }
     } catch (error: any) {
       console.error('❌ Error scoring recent articles:', error.message);
@@ -265,7 +269,7 @@ export function scoreEvidenceSufficiency(
       console.error('❌ Error scoring systematic reviews:', error.message);
     }
 
-    // 6. Evidence Diversity Bonus - 10 points
+    // 6. Evidence Diversity Bonus - 15 points (INCREASED from 10)
     // ADDED: Reward having multiple types of evidence even if not hitting all thresholds
     // This prevents false "limited evidence" when we have a good mix
     try {
@@ -285,25 +289,39 @@ export function scoreEvidenceSufficiency(
 
       // If we have 2+ types of evidence, add diversity bonus
       if (evidenceTypes >= 2) {
-        const diversityBonus = Math.min(10, evidenceTypes * 3);
+        const diversityBonus = Math.min(15, evidenceTypes * 4);
         score += diversityBonus;
         reasoning.push(`Evidence diversity bonus: ${evidenceTypes} types of evidence (+${diversityBonus} points)`);
+      }
+      
+      // 7. Base Evidence Bonus - 10 points
+      // ADDED: Give bonus just for having ANY evidence to prevent false "insufficient"
+      const totalSources = 
+        (evidence.pubmedArticles?.length || 0) +
+        (evidence.pubmedReviews?.length || 0) +
+        (evidence.guidelines?.length || 0) +
+        (evidence.cochraneReviews?.length || 0) +
+        (evidence.clinicalTrials?.length || 0);
+      
+      if (totalSources >= 5) {
+        score += 10;
+        reasoning.push(`Base evidence bonus: ${totalSources} total sources (+10 points)`);
       }
     } catch (error: any) {
       console.error('❌ Error calculating diversity bonus:', error.message);
     }
 
     // Determine quality level based on score
-    // SOFTENED THRESHOLDS: More lenient to avoid false "limited evidence"
+    // VERY SOFTENED THRESHOLDS: Generous scoring to use available evidence
     let level: 'excellent' | 'good' | 'limited' | 'insufficient';
-    if (score >= 60) {  // Lowered from 70
+    if (score >= 50) {  // Lowered from 60 - Most queries should hit this
       level = 'excellent';
-    } else if (score >= 40) {  // Lowered from 50
+    } else if (score >= 30) {  // Lowered from 40 - Even moderate evidence is "good"
       level = 'good';
-    } else if (score >= 25) {  // Lowered from 30
+    } else if (score >= 15) {  // Lowered from 25 - Only truly sparse evidence is "limited"
       level = 'limited';
     } else {
-      level = 'insufficient';
+      level = 'insufficient';  // Only when we have almost nothing
     }
 
     // Add summary reasoning
