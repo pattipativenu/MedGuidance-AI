@@ -5,7 +5,7 @@
 
 set -e
 
-PROJECT_ID="mediguidence-ai"
+PROJECT_ID="medguidance-ai"
 SERVICE_NAME="medguidance-ai"
 REGION="us-central1"
 IMAGE_NAME="gcr.io/${PROJECT_ID}/${SERVICE_NAME}:latest"
