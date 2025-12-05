@@ -830,6 +830,25 @@ ${citationInstruction}
       }
     }
 
+    // URL VALIDATION - Fix broken or invalid URLs in citations
+    if (mode === "doctor") {
+      try {
+        const { validateResponseURLs } = await import("@/lib/citation/url-validator");
+        
+        const urlValidation = validateResponseURLs(responseText);
+        responseText = urlValidation.validatedResponse;
+        
+        if (urlValidation.fixedCount > 0 || urlValidation.removedCount > 0) {
+          console.log(`🔗 URL Validation: Fixed ${urlValidation.fixedCount}, Removed ${urlValidation.removedCount} invalid URLs`);
+        } else {
+          console.log("✅ All citation URLs validated successfully");
+        }
+      } catch (urlError: any) {
+        console.error("❌ URL validation error:", urlError.message);
+        // Continue even if validation fails
+      }
+    }
+
     // REFERENCE ENRICHMENT - Temporarily disabled due to missing dependency
     // TODO: Re-enable after fixing reference-enrichment.ts dependency
     if (mode === "doctor" && false) {

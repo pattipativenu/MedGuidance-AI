@@ -147,7 +147,9 @@ export function UnifiedReferenceSection({ references, mode }: UnifiedReferenceSe
                       // Badge color based on type
                       let badgeClass = 'bg-gray-100 text-gray-700';
                       
-                      if (badge === 'Practice Guideline') {
+                      if (badge === 'PMCID') {
+                        badgeClass = 'bg-indigo-100 text-indigo-700 border border-indigo-200';
+                      } else if (badge === 'Practice Guideline') {
                         badgeClass = 'bg-blue-100 text-blue-700';
                       } else if (badge === 'Systematic Review') {
                         badgeClass = 'bg-amber-100 text-amber-700';

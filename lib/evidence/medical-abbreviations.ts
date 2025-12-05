@@ -29,9 +29,16 @@ export const MED_ABBREVS: Record<string, string> = {
   MI: "myocardial infarction",
   STEMI: "ST-elevation myocardial infarction",
   NSTEMI: "non–ST-elevation myocardial infarction",
+  "NSTE-ACS": "non-ST elevation acute coronary syndrome",
+  NSTEACS: "non-ST elevation acute coronary syndrome",
   PCI: "percutaneous coronary intervention",
   CABG: "coronary artery bypass grafting",
   BP: "blood pressure",
+  ACC: "American College of Cardiology",
+  AHA: "American Heart Association",
+  ESC: "European Society of Cardiology",
+  DAPT: "dual antiplatelet therapy",
+  CrCl: "creatinine clearance",
   
   // ================== RENAL & NEPHROLOGY ==================
   CKD: "chronic kidney disease",
@@ -45,12 +52,16 @@ export const MED_ABBREVS: Record<string, string> = {
   RASi: "renin-angiotensin system inhibitor",
   MRA: "mineralocorticoid receptor antagonist",
   SGLT2i: "sodium-glucose cotransporter-2 inhibitor",
+  SGLT2: "sodium-glucose cotransporter-2",
   
   // Endocrine
   DM: "diabetes mellitus",
   T1DM: "type 1 diabetes mellitus",
   T2DM: "type 2 diabetes mellitus",
   HbA1c: "glycated hemoglobin",
+  GLP1: "glucagon-like peptide-1",
+  "GLP-1": "glucagon-like peptide-1",
+  ADA: "American Diabetes Association",
   
   // Pulmonary
   COPD: "chronic obstructive pulmonary disease",
@@ -208,6 +219,13 @@ export const MED_ABBREVS: Record<string, string> = {
   CRC: "colorectal cancer",
   HCC: "hepatocellular carcinoma",
   RCC: "renal cell carcinoma",
+  "PD-L1": "programmed death-ligand 1",
+  PDL1: "programmed death-ligand 1",
+  BRCA1: "breast cancer gene 1",
+  BRCA2: "breast cancer gene 2",
+  "BRCA1/2": "breast cancer genes 1 and 2",
+  PARP: "poly (ADP-ribose) polymerase",
+  NCCN: "National Comprehensive Cancer Network",
   
   // Staging & Response
   TNM: "tumor node metastasis staging",
@@ -234,6 +252,7 @@ export const MED_ABBREVS: Record<string, string> = {
   NNT: "number needed to treat",
   PPV: "positive predictive value",
   NPV: "negative predictive value",
+  DDx: "differential diagnosis",
   
   // ================== INFECTIOUS DISEASE ==================
   UTI: "urinary tract infection",
@@ -249,6 +268,7 @@ export const MED_ABBREVS: Record<string, string> = {
   // Systemic Infections
   SIRS: "systemic inflammatory response syndrome",
   Sepsis: "sepsis",
+  IDSA: "Infectious Diseases Society of America",
   
   // Viral Infections
   HIV: "human immunodeficiency virus",
@@ -335,6 +355,7 @@ export const MED_ABBREVS: Record<string, string> = {
   PFT: "pulmonary function test",
   BiPAP: "bilevel positive airway pressure",
   CPAP: "continuous positive airway pressure",
+  ECMO: "extracorporeal membrane oxygenation",
   
   // Endocrinology (Additional)
   DKA: "diabetic ketoacidosis",

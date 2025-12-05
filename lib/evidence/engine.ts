@@ -1,5 +1,5 @@
 /**
- * Evidence Engine - Coordinates all 20+ medical database evidence sources
+ * Evidence Engine - Coordinates all 57+ medical database evidence sources
  * This is the main interface for retrieving clinical evidence
  * 
  * RAG INTEGRATION: Now uses intelligent evidence retrieval with scenario-specific queries
@@ -693,35 +693,36 @@ export async function gatherEvidence(
     ),
 
     // Europe PMC comprehensive search (recent, cited, preprints, open access)
-    comprehensiveSearch(clinicalQuery),
+    // USE EXPANDED QUERY for better evidence retrieval
+    comprehensiveSearch(primarySearchQuery),
 
     // PMC full-text search (articles, recent, reviews)
-    comprehensivePMCSearch(clinicalQuery),
+    comprehensivePMCSearch(primarySearchQuery),
 
     // Cochrane Library systematic reviews (gold standard)
-    comprehensiveCochraneSearch(clinicalQuery),
+    comprehensiveCochraneSearch(primarySearchQuery),
 
     // Semantic Scholar search (general + highly cited) - INCREASED from 5 to 8
-    searchSemanticScholar(clinicalQuery, 8),
-    searchHighlyCitedMedical(clinicalQuery, 8),
+    searchSemanticScholar(primarySearchQuery, 8),
+    searchHighlyCitedMedical(primarySearchQuery, 8),
 
     // MedlinePlus consumer health information
-    comprehensiveMedlinePlusSearch(clinicalQuery, drugNames),
+    comprehensiveMedlinePlusSearch(primarySearchQuery, drugNames),
 
     // DailyMed FDA drug labels
-    comprehensiveDailyMedSearch(clinicalQuery),
+    comprehensiveDailyMedSearch(primarySearchQuery),
 
     // American Academy of Pediatrics (AAP) guidelines - for pediatric queries
-    comprehensiveAAPSearch(clinicalQuery),
+    comprehensiveAAPSearch(primarySearchQuery),
 
     // RxNorm drug information (NLM standardized drug nomenclature)
-    comprehensiveRxNormSearch(clinicalQuery, drugNames),
+    comprehensiveRxNormSearch(primarySearchQuery, drugNames),
 
     // NCBI Books (StatPearls and medical textbooks) - INCREASED from 3 to 5
-    searchStatPearls(clinicalQuery, 5),
+    searchStatPearls(primarySearchQuery, 5),
 
     // OMIM (genetic disorders - only if genetic query detected) - INCREASED from 3 to 5
-    isGeneticQuery(clinicalQuery) ? searchOMIM(clinicalQuery, 5) : Promise.resolve([]),
+    isGeneticQuery(primarySearchQuery) ? searchOMIM(primarySearchQuery, 5) : Promise.resolve([]),
 
     // Drug-specific data (if drug names provided)
     ...drugNames.flatMap(drug => [
@@ -744,9 +745,10 @@ export async function gatherEvidence(
   let pubChemBioAssays: PubChemBioAssay[] = [];
 
   // Get drug terms - either from provided drugNames or extract from query
-  let drugTermsForPubChem = drugNames.length > 0 ? drugNames : extractDrugTermsFromQuery(clinicalQuery);
+  // USE EXPANDED QUERY for better drug term extraction
+  let drugTermsForPubChem = drugNames.length > 0 ? drugNames : extractDrugTermsFromQuery(primarySearchQuery);
 
-  if (shouldUsePubChemFallback(dailyMedData.drugs.length, clinicalQuery) && drugTermsForPubChem.length > 0) {
+  if (shouldUsePubChemFallback(dailyMedData.drugs.length, primarySearchQuery) && drugTermsForPubChem.length > 0) {
     console.log(`💊 DailyMed has ${dailyMedData.drugs.length} results, using PubChem fallback for: ${drugTermsForPubChem.join(', ')}...`);
 
     try {
@@ -1181,6 +1183,46 @@ export async function formatEvidenceForPrompt(
 
   let formatted = "\n\n--- EVIDENCE RETRIEVED FROM MULTIPLE DATABASES ---\n\n";
 
+  // STEP 0.5: Add Medical Abbreviation Expansions (CRITICAL FOR LLM UNDERSTANDING)
+  // This ensures the LLM always understands the full meaning of medical abbreviations
+  if (clinicalQuery) {
+    try {
+      const { getAbbreviationCoverage, getExpandedTerms } = await import('./medical-abbreviations');
+      const coverage = getAbbreviationCoverage(clinicalQuery);
+      
+      if (coverage.knownAbbrevs.length > 0 || coverage.unknownAbbrevs.length > 0) {
+        formatted += "**📖 MEDICAL ABBREVIATIONS IN THIS QUERY:**\n\n";
+        formatted += "The following medical abbreviations were detected and expanded for your understanding:\n\n";
+        
+        // Show known abbreviations with their expansions
+        if (coverage.knownAbbrevs.length > 0) {
+          formatted += "**Known Abbreviations:**\n";
+          const expandedTerms = getExpandedTerms(clinicalQuery);
+          coverage.knownAbbrevs.forEach((abbr, idx) => {
+            if (expandedTerms[idx]) {
+              formatted += `- **${abbr}** = ${expandedTerms[idx]}\n`;
+            }
+          });
+          formatted += "\n";
+        }
+        
+        // Flag unknown abbreviations for LLM interpretation
+        if (coverage.unknownAbbrevs.length > 0) {
+          formatted += "**Unknown Abbreviations (interpret from context):**\n";
+          coverage.unknownAbbrevs.forEach(abbr => {
+            formatted += `- **${abbr}** = (interpret based on clinical context)\n`;
+          });
+          formatted += "\n";
+        }
+        
+        formatted += "**🎯 USE THESE FULL TERMS when searching the evidence below and in your response.**\n\n";
+        formatted += "---\n\n";
+      }
+    } catch (error) {
+      console.error("Error adding abbreviation expansions:", error);
+    }
+  }
+
   // STEP 0.6: Inject Anchor Guidelines Section (CRITICAL FIX)
   // This ensures anchor guidelines are prominently displayed and prioritized
   if (clinicalQuery) {
@@ -1469,6 +1511,14 @@ export async function formatEvidenceForPrompt(
   try {
     const { scoreEvidenceSufficiency, formatSufficiencyForPrompt, formatSufficiencyWarning } = require('./sufficiency-scorer');
     const sufficiencyScore = scoreEvidenceSufficiency(evidence);
+    
+    // Add instruction to NOT include this in the response
+    formatted += "\n\n**🚨 CRITICAL INSTRUCTION - INTERNAL USE ONLY:**\n";
+    formatted += "The following 'EVIDENCE QUALITY ASSESSMENT' section is for YOUR INTERNAL USE ONLY.\n";
+    formatted += "**DO NOT include this section in your response to the user.**\n";
+    formatted += "**DO NOT copy or paraphrase this assessment in your Clinical Answer or Evidence Summary.**\n";
+    formatted += "Use this information to guide your confidence level, but DO NOT display it.\n\n";
+    
     formatted += formatSufficiencyForPrompt(sufficiencyScore);
 
     // Add warning if evidence is limited or insufficient

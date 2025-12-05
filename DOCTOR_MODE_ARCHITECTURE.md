@@ -2,7 +2,7 @@
 
 ## Overview
 
-Doctor Mode is an **evidence-based clinical research copilot** designed for healthcare professionals, medical students, and researchers. It integrates **57 medical databases and APIs** with **real-time AI search** to provide comprehensive, cited medical insights with maximum coverage.
+Doctor Mode is an **evidence-based clinical research copilot** designed for healthcare professionals, medical students, and researchers. It integrates **46+ medical databases and APIs** with **real-time AI search** to provide comprehensive, cited medical insights with maximum coverage.
 
 **Target Users:**
 - Licensed clinicians (doctors, specialists, PAs, pharmacists)
@@ -64,7 +64,7 @@ Doctor Mode is an **evidence-based clinical research copilot** designed for heal
 │  ┌──────────────────────────────────────────────────────────────────────────────┐   │
 │  │                         EVIDENCE GATHERING                                    │   │
 │  │  • Calls gatherEvidence() from lib/evidence/engine.ts                        │   │
-│  │  • Parallel search across 57 medical databases and APIs                      │   │
+│  │  • Parallel search across 46+ medical databases and APIs                     │   │
 │  │  • Returns EvidencePackage with all sources                                  │   │
 │  └──────────────────────────────────────────────────────────────────────────────┘   │
 │                                          │                                           │

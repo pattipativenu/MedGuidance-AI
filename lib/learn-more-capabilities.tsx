@@ -187,16 +187,10 @@ export const DOCTOR_MODE_CAPABILITIES = [
         ]
       },
       {
-        text: "A 56-year-old woman with a known right frontal convexity meningioma is being followed with serial MRI scans. She is currently asymptomatic except for mild, stable headaches. The two attached post-contrast axial brain MRI images are from different time points several months apart. Interpret these MRI scans, focusing on the meningioma: estimate whether there is radiologic evidence of tumor growth or stability, describe key imaging features (location, extra-axial appearance, dural attachment, mass effect, edema), and explain how these findings should guide ongoing surveillance versus neurosurgical referral.",
+        text: "A 62-year-old woman with a history of headaches undergoes brain MRI showing a right frontal convexity extra-axial mass with dural tail sign. Serial MRI obtained 6 months later. Interpret the imaging findings, assess for interval growth, discuss the differential diagnosis (meningioma vs other extra-axial masses), and provide evidence-based recommendations for observation versus surgical intervention based on WHO grading and growth rate.",
         imageUrls: [
           "/med-images/brain MRI.png",
           "/med-images/Brain-mri-2.png"
-        ]
-      },
-      {
-        text: "A 35-year-old patient presents after a fall from a ladder, landing directly on the right knee. They report immediate pain, swelling, and difficulty bearing weight. The attached anteroposterior and lateral X-rays of the right knee demonstrate a suspected lateral tibial plateau fracture. Interpret these knee radiographs, describing any tibial plateau fracture (location, depression or splitting of the articular surface), joint effusion or lipohaemarthrosis, and associated injuries (e.g., fibular head fracture). Then outline the key immediate management priorities in the emergency department, indications for CT to further characterize the fracture, and when urgent orthopaedic surgery consultation is required.",
-        imageUrls: [
-          "/med-images/Tibial-XR.png"
         ]
       }
     ]

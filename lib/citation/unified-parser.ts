@@ -226,21 +226,23 @@ function parseReferenceMetadata(refString: string, number: number): ParsedRefere
     }
   }
   
+  // Extract PMCID first (prefer full-text over abstract)
+  const pmcMatch = refString.match(/PMC(ID)?:?\s*(PMC\d+)/i);
+  if (pmcMatch) {
+    pmcid = pmcMatch[2];
+    // PMC has priority - full text available
+    if (!url) {
+      url = `https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/`;
+    }
+  }
+  
   // Extract PMID
   const pmidMatch = refString.match(/PMID:?\s*(\d+)/i);
   if (pmidMatch) {
     pmid = pmidMatch[1];
-    if (!url) {
+    // Only use PMID URL if no PMC URL exists
+    if (!url && !pmcid) {
       url = `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`;
-    }
-  }
-  
-  // Extract PMCID
-  const pmcMatch = refString.match(/PMC(ID)?:?\s*(PMC\d+)/i);
-  if (pmcMatch) {
-    pmcid = pmcMatch[2];
-    if (!url) {
-      url = `https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/`;
     }
   }
   
@@ -248,7 +250,8 @@ function parseReferenceMetadata(refString: string, number: number): ParsedRefere
   const doiMatch = refString.match(/doi:?\s*(10\.\d{4,9}\/[-._;()\/:A-Za-z0-9]+)/i);
   if (doiMatch) {
     doi = doiMatch[1].replace(/[.,;:)\]]+$/, ''); // Clean trailing punctuation
-    if (!url) {
+    // Only use DOI if no PMC or PMID URL exists
+    if (!url && !pmcid && !pmid) {
       url = `https://doi.org/${doi}`;
     }
   }
@@ -257,6 +260,22 @@ function parseReferenceMetadata(refString: string, number: number): ParsedRefere
   const bookshelfMatch = refString.match(/NBK(\d+)/i);
   if (bookshelfMatch && !url) {
     url = `https://www.ncbi.nlm.nih.gov/books/NBK${bookshelfMatch[1]}/`;
+  }
+  
+  // Extract Europe PMC ID
+  const europePMCMatch = refString.match(/europepmc\.org\/article\/MED\/(\d+)/i);
+  if (europePMCMatch && !url) {
+    url = `https://europepmc.org/article/MED/${europePMCMatch[1]}`;
+  }
+  
+  // Validate URL format
+  if (url) {
+    try {
+      new URL(url);
+    } catch (e) {
+      console.warn(`Invalid URL detected: ${url}`);
+      url = ''; // Clear invalid URL
+    }
   }
   
   // Extract authors (look for pattern: "Authors: Name1, Name2, Name3")
@@ -303,6 +322,11 @@ function parseReferenceMetadata(refString: string, number: number): ParsedRefere
     // Don't add other badges for image references
     // The component will show the image badge separately
   } else {
+    // PMCID Badge - Add first if PMC article (full-text available)
+    if (pmcid) {
+      badges.push('PMCID');
+    }
+    
     // Practice Guideline
     if (refLower.includes('guideline') || refLower.includes('practice guideline') || 
         refLower.includes('clinical practice') || refLower.includes('standards of care')) {

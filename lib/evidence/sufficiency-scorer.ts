@@ -423,6 +423,8 @@ export function isEvidenceSufficient(score: SufficiencyScore): boolean {
 
 /**
  * Format sufficiency score for display in evidence prompt
+ * 
+ * ⚠️ CRITICAL: This is for AI's INTERNAL USE ONLY - should NOT appear in user-facing response
  */
 export function formatSufficiencyForPrompt(score: SufficiencyScore): string {
   const emoji = {
@@ -432,7 +434,7 @@ export function formatSufficiencyForPrompt(score: SufficiencyScore): string {
     'insufficient': '🔴',
   };
 
-  let formatted = '\n\n--- EVIDENCE QUALITY ASSESSMENT ---\n\n';
+  let formatted = '\n\n--- EVIDENCE QUALITY ASSESSMENT (INTERNAL - DO NOT INCLUDE IN RESPONSE) ---\n\n';
   formatted += `**Overall Quality:** ${emoji[score.level]} ${score.level.toUpperCase()} (${score.score}/100)\n\n`;
 
   formatted += '**Evidence Breakdown:**\n';
@@ -447,6 +449,7 @@ export function formatSufficiencyForPrompt(score: SufficiencyScore): string {
     formatted += 'Recommendations are well-supported but may benefit from additional sources.\n\n';
   }
 
+  formatted += '**⚠️ REMINDER: DO NOT copy this assessment into your response. Use it to guide your confidence level only.**\n\n';
   formatted += '--- END EVIDENCE QUALITY ASSESSMENT ---\n\n';
 
   return formatted;

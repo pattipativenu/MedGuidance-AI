@@ -122,21 +122,36 @@ Use this EXACT structure:
 1. [Full Article Title Here](URL)
    Authors: Name1, Name2, Name3, et al.
    Journal: Journal Name. Year.
-   PMID: xxxxx | DOI: xxxxx
+   PMID: xxxxx | PMCID: PMCxxxxx | DOI: xxxxx
    [Source Badge] - [Quality Badge]
 
+**CRITICAL TITLE EXTRACTION RULES:**
+- **ALWAYS use the ACTUAL ARTICLE TITLE from the evidence** - NEVER use generic titles like:
+  ❌ "National Institutes of Health"
+  ❌ "PubMed Central"
+  ❌ "National Library of Medicine"
+  ❌ "Clinical Significance"
+  ❌ "PubMed Article"
+- **EXTRACT the real article title** from the evidence text (e.g., "Electrodiagnostic criteria for neuromuscular transmission disorders")
+- **For PMC articles**: Look for the article title in the evidence, NOT the source name
+
 **CRITICAL URL CONSTRUCTION RULES (COPYRIGHT COMPLIANCE):**
+- **PREFER PMC (Full Text)**: https://pmc.ncbi.nlm.nih.gov/articles/PMC[PMCID] (if available)
 - **ALWAYS USE PUBMED**: https://pubmed.ncbi.nlm.nih.gov/[PMID]
 - **NEVER link to paywalled journals**: NEJM, Lancet, JAMA direct links are PROHIBITED
-- **PMC for open access**: https://pmc.ncbi.nlm.nih.gov/articles/PMC[PMCID] (if available)
 - **Europe PMC**: https://europepmc.org/article/MED/[PMID] (if open access)
 - **Guidelines**: Use official government URLs (WHO, CDC, NICE, etc.)
 
 **MANDATORY PRIORITY ORDER FOR URLS:**
-1. **PubMed PMID link** (REQUIRED) - https://pubmed.ncbi.nlm.nih.gov/[PMID]
-2. PMC ID (if available and open access) - https://pmc.ncbi.nlm.nih.gov/articles/PMC[PMCID]
+1. **PMC ID** (if available and open access) - https://pmc.ncbi.nlm.nih.gov/articles/PMC[PMCID] - FULL TEXT
+2. **PubMed PMID link** - https://pubmed.ncbi.nlm.nih.gov/[PMID] - ABSTRACT
 3. Europe PMC (if marked as open access) - https://europepmc.org/article/MED/[PMID]
 4. Official guideline URLs (government/professional societies only)
+
+**CRITICAL IDENTIFIER RULES:**
+- **ALWAYS include PMCID when available**: PMCID:PMC11931287
+- **PMC articles should show PMCID badge** in the source badge
+- **Include all available identifiers**: PMID, PMCID, DOI
 
 **ABSOLUTELY FORBIDDEN:**
 - ❌ NEVER use www.nejm.org URLs
@@ -149,7 +164,7 @@ Use this EXACT structure:
 **WHY:** Copyright law and fair use principles require linking to public domain sources. Paywalled content violates these principles.
 
 **Badge Examples:**
-- Source: [PMC], [Europe PMC], [PubMed], [Cochrane], [Practice Guideline]
+- Source: [PMCID] (for PubMed Central full-text), [Europe PMC], [PubMed], [Cochrane], [Practice Guideline]
 - Quality: [Systematic Review], [Recent], [Leading Journal], [Open Access]
 `;
 

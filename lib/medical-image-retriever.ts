@@ -252,7 +252,7 @@ export async function retrieveMedicalImages(
 
   console.log(`📋 Image queries: ${allQueries.join(', ')}`);
 
-  // Search for each query
+  // Search for each query with improved error handling
   for (const imageQuery of allQueries) {
     try {
       const response = await fetch('https://google.serper.dev/images', {
@@ -267,13 +267,18 @@ export async function retrieveMedicalImages(
           gl: 'us',
           hl: 'en'
         }),
+        // Add timeout to prevent hanging
+        signal: AbortSignal.timeout(10000) // 10 second timeout
       });
 
-      if (!response.ok) continue;
+      if (!response.ok) {
+        console.warn(`Serper API returned ${response.status} for query: ${imageQuery}`);
+        continue;
+      }
 
       const data = await response.json();
 
-      if (data.images) {
+      if (data.images && Array.isArray(data.images)) {
         // Apply scenario-based filtering BEFORE scoring
         const rawImages = data.images.map((img: any) => ({
           title: img.title || '',
@@ -293,24 +298,39 @@ export async function retrieveMedicalImages(
 
           if (score >= 45) { // Lowered threshold for better coverage
             try {
+              // Validate URL before adding
+              const imageUrl = img.url;
+              if (!imageUrl || !imageUrl.startsWith('http')) {
+                console.warn(`Invalid image URL: ${imageUrl}`);
+                return;
+              }
+              
+              // Validate URL is accessible (basic check)
+              new URL(imageUrl);
+              
               const sourceDomain = new URL(data.images.find((orig: any) => orig.imageUrl === img.url)?.link || 'https://example.com').hostname;
+              
               allCandidates.push({
-                url: img.url,
-                title: img.title,
-                snippet: img.description,
+                url: imageUrl,
+                title: img.title || 'Medical Image',
+                snippet: img.description || '',
                 sourceDomain,
                 score: Math.max(score, img.relevanceScore), // Use higher of two scores
-                thumbnail: img.thumbnail
+                thumbnail: img.thumbnail || imageUrl // Fallback to main URL if no thumbnail
               });
             } catch (urlError) {
               // Skip images with invalid URLs
-              console.warn(`Invalid URL for image: ${img.title}`);
+              console.warn(`Invalid URL for image: ${img.title} - ${urlError}`);
             }
           }
         });
       }
-    } catch (error) {
-      console.error(`Error searching images for "${imageQuery}":`, error);
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.error(`Image search timeout for "${imageQuery}"`);
+      } else {
+        console.error(`Error searching images for "${imageQuery}":`, error.message);
+      }
     }
   }
 
